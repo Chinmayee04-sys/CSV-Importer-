@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: csv-importer-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node src/index.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: AI_PROVIDER
+        value: ""
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
