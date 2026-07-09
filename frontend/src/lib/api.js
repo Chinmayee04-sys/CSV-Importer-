@@ -1,4 +1,5 @@
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+let BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+if (BASE.endsWith('/api')) BASE = BASE.slice(0, -4);
 const API_BASE = `${BASE}/api`;
 
 export async function parseCsv(file) {
