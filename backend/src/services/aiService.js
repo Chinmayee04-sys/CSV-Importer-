@@ -378,16 +378,17 @@ function scanAllColumns(record) {
   const allValues = [];
 
   for (const val of Object.values(record)) {
-    if (!val || typeof val !== 'string') continue;
-    allValues.push(val);
+    if (val === null || val === undefined) continue;
+    const strVal = String(val);
+    allValues.push(strVal);
 
-    const emailsInVal = val.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g);
+    const emailsInVal = strVal.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g);
     if (emailsInVal) allEmails.push(...emailsInVal);
 
-    const digits = val.replace(/[^0-9]/g, '');
-    const isDate = /^\d{4}[-/]\d{1,2}[-/]\d{1,2}/.test(val.trim());
+    const digits = strVal.replace(/[^0-9]/g, '');
+    const isDate = /^\d{4}[-/]\d{1,2}[-/]\d{1,2}/.test(strVal.trim());
     const isZip = digits.length === 5 || digits.length === 6;
-    if (digits.length >= 10 && !isDate && !isZip) allPhones.push({ raw: val, digits });
+    if (digits.length >= 10 && !isDate && !isZip) allPhones.push({ raw: strVal, digits });
   }
 
   const uniqueEmails = [...new Set(allEmails)];
@@ -512,10 +513,10 @@ function extractRecordsFallback(records) {
       }
     }
 
-    const hasEmail = !!(email || scanned.allEmails[0]);
-    const hasPhone = !!(mobileWithoutCode || (scanned.allPhones.length > 0));
+    const foundEmail = email && email.length > 0;
+    const foundPhone = mobileWithoutCode && mobileWithoutCode.length > 0;
 
-    if (!hasEmail && !hasPhone) return null;
+    if (!foundEmail && !foundPhone) return null;
 
     return {
       created_at,
