@@ -26,21 +26,33 @@ router.post('/import', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const records = parseCsv(req.file.buffer);
+    const rawRecords = parseCsv(req.file.buffer);
 
-    if (records.length === 0) {
+    if (rawRecords.length === 0) {
       return res.status(400).json({ error: 'CSV file is empty' });
     }
 
-    const extracted = await extractRecords(records);
+    const first = rawRecords[0];
+    const firstKeys = Object.keys(first);
+    const firstVals = Object.values(first).map(v => String(v));
+    const firstJoined = firstVals.join(' ');
+    const emailInRaw = firstJoined.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    const digitsInRaw = firstJoined.replace(/[^0-9]/g, '');
+    const phoneInRaw = digitsInRaw.length >= 10 ? digitsInRaw : '';
 
-    const sample = extracted[0];
+    const extracted = await extractRecords(rawRecords);
+    const extractedFirst = extracted[0];
+
     const debug = {
-      hasEmail: !!(sample && sample.email),
-      hasPhone: !!(sample && sample.mobile_without_country_code),
-      email: sample ? sample.email : 'no records',
-      phone: sample ? sample.mobile_without_country_code : 'no records',
-      keys: sample ? Object.keys(sample) : [],
+      rawColumns: firstKeys,
+      rawValues: firstVals,
+      rawHasEmail: !!emailInRaw,
+      rawHasPhone: !!phoneInRaw,
+      rawEmail: emailInRaw ? emailInRaw[0] : null,
+      rawPhone: phoneInRaw || null,
+      mappedEmail: extractedFirst ? extractedFirst.email : null,
+      mappedPhone: extractedFirst ? extractedFirst.mobile_without_country_code : null,
+      mappedName: extractedFirst ? extractedFirst.name : null,
       extractedCount: extracted.length,
     };
 
@@ -70,7 +82,7 @@ router.post('/import', upload.single('file'), async (req, res) => {
       imported: validated.slice(0, DISPLAY_LIMIT),
       totalImported,
       totalSkipped,
-      totalRecords: records.length,
+      totalRecords: rawRecords.length,
       debug,
     });
   } catch (error) {
