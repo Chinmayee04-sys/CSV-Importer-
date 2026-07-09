@@ -74,12 +74,14 @@ router.post('/import', upload.single('file'), async (req, res) => {
       description: r.description || '',
     }));
 
-    const totalImported = validated.length;
-    const totalSkipped = 0;
+    const totalBeforeFilter = validated.length;
+    const withContact = validated.filter(r => r.email || r.mobile_without_country_code);
+    const totalImported = withContact.length;
+    const totalSkipped = totalBeforeFilter - totalImported;
 
     const DISPLAY_LIMIT = 50;
     res.json({
-      imported: validated.slice(0, DISPLAY_LIMIT),
+      imported: withContact.slice(0, DISPLAY_LIMIT),
       totalImported,
       totalSkipped,
       totalRecords: rawRecords.length,
