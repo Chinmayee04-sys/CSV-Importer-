@@ -513,10 +513,15 @@ function extractRecordsFallback(records) {
       }
     }
 
-    const foundEmail = email && email.length > 0;
-    const foundPhone = mobileWithoutCode && mobileWithoutCode.length > 0;
+    const allRaw = Object.values(record).filter(v => v != null).map(v => String(v)).join(' ');
+    const rawEmail = allRaw.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    const rawDigits = allRaw.replace(/[^0-9]/g, '');
+    const rawPhone = rawDigits.length >= 10 ? rawDigits : '';
 
-    if (!foundEmail && !foundPhone) return null;
+    if (!email && rawEmail) email = rawEmail[0];
+    if (!mobileWithoutCode && rawPhone) mobileWithoutCode = rawPhone;
+
+    if (!email && !mobileWithoutCode) return null;
 
     return {
       created_at,
