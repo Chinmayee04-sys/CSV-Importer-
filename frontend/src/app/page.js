@@ -142,7 +142,7 @@ export default function Home() {
               <div className="stat-label">Total Records</div>
             </div>
           </div>
-          <ResultTable records={result.imported} />
+          <ResultTable records={result.imported} totalRecords={result.totalImported} />
           <div className="action-bar">
             <button className="btn btn-primary" onClick={handleReset}>
               Import Another File

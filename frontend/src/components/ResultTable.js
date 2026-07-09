@@ -18,13 +18,18 @@ const CRM_COLUMNS = [
   'description',
 ];
 
-export default function ResultTable({ records }) {
+export default function ResultTable({ records, totalRecords }) {
   if (!records || records.length === 0) {
     return <div className="empty-state">No records imported</div>;
   }
 
   return (
     <div className="table-wrapper">
+      {totalRecords > records.length && (
+        <p style={{ marginBottom: 8, color: 'var(--text-muted)', fontSize: 14 }}>
+          Showing first {records.length} of {totalRecords} imported records
+        </p>
+      )}
       <table>
         <thead>
           <tr>

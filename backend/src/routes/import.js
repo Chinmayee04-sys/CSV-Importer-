@@ -55,38 +55,15 @@ router.post('/import', upload.single('file'), async (req, res) => {
     const totalImported = validated.length;
     const totalSkipped = records.length - totalImported;
 
+    const DISPLAY_LIMIT = 50;
     res.json({
-      imported: validated,
+      imported: validated.slice(0, DISPLAY_LIMIT),
       totalImported,
       totalSkipped,
       totalRecords: records.length,
     });
   } catch (error) {
     res.status(500).json({ error: 'AI extraction failed', message: error.message });
-  }
-});
-
-router.post('/debug', upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-
-    const records = parseCsv(req.file.buffer);
-    const firstRecord = records[0];
-    const recordKeys = Object.keys(firstRecord);
-    const recordValues = Object.values(firstRecord).map(v => String(v));
-
-    const extracted = await extractRecords(records.slice(0, 3));
-
-    res.json({
-      totalRecords: records.length,
-      extractedCount: extracted.length,
-      sampleKeys: recordKeys,
-      sampleValues: recordValues,
-      sampleRecord: firstRecord,
-      sampleExtracted: extracted[0] || null,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message, stack: error.stack });
   }
 });
 
