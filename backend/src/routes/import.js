@@ -33,8 +33,10 @@ router.post('/import', upload.single('file'), async (req, res) => {
     }
 
     const extracted = await extractRecords(records);
+    const withEmailOrPhone = extracted.filter(r => r.email || r.mobile_without_country_code);
+    const totalSkipped = records.length - withEmailOrPhone.length;
 
-    const validated = extracted.map(r => ({
+    const validated = withEmailOrPhone.map(r => ({
       created_at: validateDate(r.created_at) || '',
       name: r.name || r.Name || '',
       email: r.email || r.Email || '',
@@ -53,7 +55,6 @@ router.post('/import', upload.single('file'), async (req, res) => {
     }));
 
     const totalImported = validated.length;
-    const totalSkipped = records.length - totalImported;
 
     const DISPLAY_LIMIT = 50;
     res.json({

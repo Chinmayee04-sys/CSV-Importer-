@@ -154,11 +154,6 @@ function extractRecordsFallback(records) {
       }
     }
 
-    const hasEmail = email && email.length > 0;
-    const hasPhone = mobileWithoutCode && mobileWithoutCode.length > 0;
-
-    if (!hasEmail && !hasPhone) return null;
-
     return {
       created_at,
       name: name || '',
@@ -176,7 +171,7 @@ function extractRecordsFallback(records) {
       possession_time: '',
       description: notes || '',
     };
-  }).filter(Boolean);
+  });
 }
 
 const SYSTEM_PROMPT = `You are a data extraction assistant. Your task is to map CSV data to CRM fields.
