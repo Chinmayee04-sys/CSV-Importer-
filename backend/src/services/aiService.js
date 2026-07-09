@@ -521,8 +521,6 @@ function extractRecordsFallback(records) {
     if (!email && rawEmail) email = rawEmail[0];
     if (!mobileWithoutCode && rawPhone) mobileWithoutCode = rawPhone;
 
-    if (!email && !mobileWithoutCode) return null;
-
     return {
       created_at,
       name: name || '',
