@@ -33,10 +33,18 @@ router.post('/import', upload.single('file'), async (req, res) => {
     }
 
     const extracted = await extractRecords(records);
-    const withEmailOrPhone = extracted.filter(r => r.email || r.mobile_without_country_code);
-    const totalSkipped = records.length - withEmailOrPhone.length;
 
-    const validated = withEmailOrPhone.map(r => ({
+    const sample = extracted[0];
+    const debug = {
+      hasEmail: !!(sample && sample.email),
+      hasPhone: !!(sample && sample.mobile_without_country_code),
+      email: sample ? sample.email : 'no records',
+      phone: sample ? sample.mobile_without_country_code : 'no records',
+      keys: sample ? Object.keys(sample) : [],
+      extractedCount: extracted.length,
+    };
+
+    const validated = extracted.map(r => ({
       created_at: validateDate(r.created_at) || '',
       name: r.name || r.Name || '',
       email: r.email || r.Email || '',
@@ -55,6 +63,7 @@ router.post('/import', upload.single('file'), async (req, res) => {
     }));
 
     const totalImported = validated.length;
+    const totalSkipped = 0;
 
     const DISPLAY_LIMIT = 50;
     res.json({
@@ -62,6 +71,7 @@ router.post('/import', upload.single('file'), async (req, res) => {
       totalImported,
       totalSkipped,
       totalRecords: records.length,
+      debug,
     });
   } catch (error) {
     res.status(500).json({ error: 'AI extraction failed', message: error.message });
