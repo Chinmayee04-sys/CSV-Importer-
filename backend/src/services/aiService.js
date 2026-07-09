@@ -512,6 +512,11 @@ function extractRecordsFallback(records) {
       }
     }
 
+    const hasEmail = !!(email || scanned.allEmails[0]);
+    const hasPhone = !!(mobileWithoutCode || (scanned.allPhones.length > 0));
+
+    if (!hasEmail && !hasPhone) return null;
+
     return {
       created_at,
       name: name || '',
