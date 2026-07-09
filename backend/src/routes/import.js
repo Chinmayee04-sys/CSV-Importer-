@@ -5,7 +5,10 @@ import { extractRecords } from '../services/aiService.js';
 import { validateCrmStatus, validateDataSource, validateDate } from '../utils/validation.js';
 
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 100 * 1024 * 1024 },
+});
 
 router.post('/parse-csv', upload.single('file'), (req, res) => {
   try {
